@@ -20,11 +20,9 @@ import { ThemeScope } from "@/components/ThemeScope.tsx";
 import { Wordmark } from "@/components/Brand.tsx";
 import { Toast, type ToastState } from "@/components/ui.tsx";
 import {
-  Activity,
   Bell,
   Home,
   MapIcon,
-  Radio,
   Shield,
   Users,
 } from "@/components/Icons.tsx";
@@ -91,7 +89,7 @@ export default function CampoPage() {
   const org = orgById(person.orgId);
   const actor = useMemo(() => actorFor(person), [person]);
 
-  const { state, dispatch, peers, selfId, online } = useVigiaBus(
+  const { state, dispatch, peers, selfId } = useVigiaBus(
     "campo",
     `${org.short} · ${person.name}`,
   );
@@ -304,7 +302,7 @@ export default function CampoPage() {
       <ThemeScope theme="campo" color="#eef1ec" />
 
       <aside className="campo__aside campo__aside--left">
-        <Link href="/" className="campo__back">
+        <Link href="/apresentacao" className="campo__back">
           <Wordmark size={26} />
         </Link>
         <div className="campo__narrative">
@@ -364,22 +362,6 @@ export default function CampoPage() {
       </aside>
 
       <main className="phone" aria-label="Aplicativo Vigia Rural">
-        <div className="phone__status" aria-hidden>
-          <span className="num">
-            {now
-              ? new Date(now).toLocaleTimeString("pt-BR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "--:--"}
-          </span>
-          <span className="phone__status-right">
-            <Radio size={13} />
-            <Activity size={13} />
-            <b className="num">{online ? "4G" : "SEM REDE"}</b>
-          </span>
-        </div>
-
         <header className="phone__header">
           <button
             type="button"

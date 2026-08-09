@@ -10,24 +10,15 @@
 .campo {
   min-height: 100vh;
   min-height: 100svh;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.05fr);
-  align-items: center;
-  gap: clamp(20px, 2.6vw, 54px);
-  padding: clamp(20px, 2.4vw, 34px);
-  background:
-    radial-gradient(
-      120% 80% at 50% -10%,
-      color-mix(in srgb, var(--surface) 82%, transparent),
-      transparent 60%
-    ),
-    linear-gradient(158deg, #eff2ed 0%, #e2e8e1 62%, #dfe6df 100%);
+  display: block;
+  padding: 0;
+  background: var(--bg);
 }
 
 /* ------------------------------------------------------------- colunas -- */
 
 .campo__aside {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 26px;
   max-width: 400px;
@@ -134,41 +125,15 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  width: 404px;
-  height: min(880px, calc(100vh - 68px));
-  min-height: 600px;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, #fff 85%, transparent);
-  border-radius: 44px;
+  border: 0;
+  border-radius: 0;
   background: var(--bg);
-  box-shadow:
-    0 2px 4px rgba(18, 34, 27, 0.08),
-    0 40px 90px rgba(18, 34, 27, 0.24),
-    inset 0 0 0 1px rgba(16, 32, 25, 0.06);
-}
-
-.phone__status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: none;
-  height: 30px;
-  padding: 9px 26px 0;
-  color: var(--ink);
-  font-size: 11px;
-  font-weight: 650;
-}
-
-.phone__status-right {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--ink-2);
-}
-
-.phone__status-right b {
-  font-size: 10px;
-  letter-spacing: 0.02em;
+  box-shadow: none;
 }
 
 .phone__header {
@@ -176,8 +141,9 @@
   align-items: center;
   justify-content: space-between;
   flex: none;
-  height: 56px;
-  padding: 0 16px 0 18px;
+  height: calc(60px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top)
+    max(18px, calc((100vw - 720px) / 2)) 0;
   border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
   background: color-mix(in srgb, var(--bg) 80%, transparent);
   backdrop-filter: blur(18px) saturate(160%);
@@ -235,7 +201,8 @@
 
 .phone__nav {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(68px, 180px));
+  justify-content: center;
   flex: none;
   padding: 8px 10px max(10px, env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
@@ -262,6 +229,8 @@
 /* --------------------------------------------------------------- telas -- */
 
 .screen {
+  width: min(100%, 720px);
+  margin: 0 auto;
   padding: 18px 18px 26px;
   display: flex;
   flex-direction: column;
@@ -1968,23 +1937,7 @@
 
 @media (max-width: 1080px) {
   .campo {
-    display: block;
-    padding: 0;
     background: var(--bg);
-  }
-  .campo__aside {
-    display: none;
-  }
-  .phone {
-    width: 100%;
-    height: 100svh;
-    min-height: 0;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  .phone__status {
-    padding-top: max(9px, env(safe-area-inset-top));
   }
 }
 
