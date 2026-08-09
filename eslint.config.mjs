@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Artefatos de ferramentas locais, fora do código do projeto.
+    ".gstack/**",
+    ".vinext/**",
+    ".wrangler/**",
+    ".presentation-build/**",
+    "presentation_assets/**",
   ]),
 ]);
 

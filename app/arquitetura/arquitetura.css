@@ -1,0 +1,225 @@
+/* Documento técnico — herda a base editorial de home.css. */
+
+.doc__hero {
+  padding-top: clamp(28px, 4vw, 56px);
+  padding-bottom: clamp(20px, 3vw, 36px);
+}
+
+.doc__hero h1 {
+  margin: 12px 0 18px;
+  max-width: 20ch;
+  font-size: clamp(34px, 4.4vw, 58px);
+  letter-spacing: -0.045em;
+}
+
+.doc__hero .lede {
+  max-width: 62ch;
+}
+
+.doc code {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--surface-3);
+  color: var(--brand-strong);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+/* --------------------------------------------------------------- diagrama */
+
+.diagram {
+  margin: 0 0 clamp(28px, 4vw, 44px);
+}
+
+.diagram svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.diagram__layer {
+  fill: var(--faint);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.diagram__title {
+  fill: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 640;
+}
+
+.diagram__body {
+  fill: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+}
+
+.diagram__mono {
+  fill: var(--brand);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.diagram figcaption {
+  max-width: 74ch;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: var(--t-caption);
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ grid */
+
+.doc__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.doc__grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.doc__grid article {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.doc__grid h3 {
+  margin-bottom: 8px;
+  font-size: var(--t-caption);
+  font-weight: 680;
+  color: var(--brand-strong);
+}
+
+.doc__grid p {
+  color: var(--ink-2);
+  font-size: var(--t-micro);
+  line-height: 1.65;
+}
+
+/* --------------------------------------------------------------- tabelas */
+
+.doc__table {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.doc__table table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+}
+
+.doc__table th {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.doc__table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: var(--t-micro);
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+.doc__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.doc__table td strong {
+  color: var(--ink);
+  font-weight: 620;
+}
+
+.doc__fields {
+  color: var(--muted) !important;
+}
+
+.doc__table--controls table {
+  min-width: 900px;
+}
+
+.doc__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 660;
+  white-space: nowrap;
+}
+
+.doc__state.is-feito {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.doc__state.is-projeto {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* --------------------------------------------------------------- modelos */
+
+.doc__models {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.doc__models article {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.doc__models h3 {
+  font-size: var(--t-lead);
+  color: var(--brand-strong);
+}
+
+.doc__formula {
+  margin: 12px 0 12px !important;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border-radius: var(--r-xs);
+  background: var(--surface-3);
+  color: var(--ink) !important;
+  font-size: var(--t-caption) !important;
+  white-space: nowrap;
+}
+
+.doc__models p {
+  color: var(--ink-2);
+  font-size: var(--t-caption);
+  line-height: 1.65;
+}
+
+@media (max-width: 1000px) {
+  .doc__grid,
+  .doc__grid--2,
+  .doc__models {
+    grid-template-columns: 1fr;
+  }
+}
