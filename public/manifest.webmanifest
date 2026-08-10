@@ -1,0 +1,16 @@
+{
+  "name": "Vigia Rural — App de Campo",
+  "short_name": "Vigia Rural",
+  "description": "Alerta geolocalizado e resposta coordenada a incêndios rurais.",
+  "start_url": "/campo",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#eef1ec",
+  "theme_color": "#146549",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

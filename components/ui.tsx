@@ -290,3 +290,50 @@ export function OrgAvatar({
     </span>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Interruptor
+// ---------------------------------------------------------------------------
+
+/**
+ * Interruptor com efeito real, não decorativo.
+ *
+ * Cada uso liga a algo que o app de fato faz — alto contraste muda a
+ * variável de cor, som liga um beep de teste. Um toggle que não muda nada é
+ * o tipo de detalhe que faz um app parecer protótipo.
+ */
+export function Switch({
+  checked,
+  onChange,
+  label,
+  detail,
+}: {
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  label: string;
+  detail?: string;
+}) {
+  return (
+    <label className="switchrow">
+      <span className="switchrow__body">
+        <strong>{label}</strong>
+        {detail && <small>{detail}</small>}
+      </span>
+      <span
+        role="switch"
+        aria-checked={checked}
+        tabIndex={0}
+        className={`switch${checked ? " is-on" : ""}`}
+        onClick={() => onChange(!checked)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onChange(!checked);
+          }
+        }}
+      >
+        <span className="switch__knob" />
+      </span>
+    </label>
+  );
+}

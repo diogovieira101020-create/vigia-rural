@@ -50,6 +50,7 @@ export const ORGS: Org[] = [
     accent: "verde",
     registry: "CAR PI-2205706-3F81…",
     detail: "1.480 ha · soja, milho e pastagem",
+    phone: "+55 86 99123-4001",
   },
   {
     id: "org-santa-luzia",
@@ -61,6 +62,7 @@ export const ORGS: Org[] = [
     accent: "areia",
     registry: "CAR PI-2205706-9A22…",
     detail: "por 2,4 km de estrada vicinal",
+    phone: "+55 86 99123-4002",
   },
   {
     id: "org-tres-irmaos",
@@ -72,6 +74,7 @@ export const ORGS: Org[] = [
     accent: "areia",
     registry: "CAR PI-2205706-5C07…",
     detail: "divisa oeste, além do riacho",
+    phone: "+55 86 99123-4003",
   },
   {
     id: "org-bela-vista",
@@ -83,6 +86,7 @@ export const ORGS: Org[] = [
     accent: "areia",
     registry: "CAR PI-2205706-1D45…",
     detail: "agricultura familiar · 62 ha",
+    phone: "+55 86 99123-4004",
   },
   {
     id: "org-assentamento",
@@ -94,6 +98,7 @@ export const ORGS: Org[] = [
     accent: "areia",
     registry: "INCRA PA-0271…",
     detail: "34 famílias · escola municipal",
+    phone: "+55 86 99123-4005",
   },
   {
     id: "org-brigada",
@@ -105,6 +110,7 @@ export const ORGS: Org[] = [
     accent: "ambar",
     registry: "Brigada privada credenciada nº 118/2025",
     detail: "8 brigadistas · pipa 6.000 L · UTV",
+    phone: "+55 86 99123-4100",
   },
   {
     id: "org-defesa-civil",
@@ -116,6 +122,7 @@ export const ORGS: Org[] = [
     accent: "azul",
     registry: "COMPDEC · Decreto Municipal 41/2023",
     detail: "plantão 24 h · coordenação municipal",
+    phone: "+55 86 3234-1199",
   },
   {
     id: "org-bombeiros",
@@ -127,6 +134,7 @@ export const ORGS: Org[] = [
     accent: "brasa",
     registry: "CBMPI · integração via protocolo estadual",
     detail: "ABT 3.000 L · atendimento regional",
+    phone: "193",
   },
 ];
 

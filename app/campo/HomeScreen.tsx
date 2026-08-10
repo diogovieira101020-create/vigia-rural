@@ -1,6 +1,7 @@
 "use client";
 
 import { Gauge } from "@/components/ui.tsx";
+import type { ToastState } from "@/components/ui.tsx";
 import {
   ChevronRight,
   Crosshair,
@@ -11,12 +12,15 @@ import {
   Smoke,
   Thermometer,
   Wind,
+  X,
 } from "@/components/Icons.tsx";
 import type { DailyRisk } from "@/lib/fire.ts";
 import { DEMO_WEATHER } from "@/lib/scenario.ts";
 import { compass } from "@/lib/geo.ts";
 import { can, ROLE_LABEL, type Actor } from "@/lib/policy.ts";
-import type { LatLon, Org, Person } from "@/lib/domain.ts";
+import { STATUS_LABEL, type Incident, type LatLon, type Org, type Person } from "@/lib/domain.ts";
+import { usePersistentState } from "@/lib/storage.ts";
+import { ReadinessChecklist } from "./ReadinessChecklist.tsx";
 import type { Tab } from "./types.ts";
 
 const RISK_COLOR: Record<DailyRisk["klass"], string> = {
@@ -46,6 +50,8 @@ export function HomeScreen({
   onReport,
   onOpenTab,
   actor,
+  recent,
+  onToast,
 }: {
   person: Person;
   org: Org;
@@ -58,9 +64,15 @@ export function HomeScreen({
   onReport: (intent: "fogo" | "suspeita") => void;
   onOpenTab: (tab: Tab) => void;
   actor: Actor;
+  recent: Incident[];
+  onToast: (toast: ToastState) => void;
 }) {
   const firstName = person.name.split(" ")[0];
   const canAlert = can(actor, "alerta:confirmar");
+  const [installDismissed, setInstallDismissed] = usePersistentState(
+    "vigia-rural:installhint",
+    false,
+  );
 
   return (
     <section className="screen">
@@ -74,6 +86,28 @@ export function HomeScreen({
           para proteger.
         </h2>
       </header>
+
+      {!installDismissed && (
+        <div className="installhint" role="status">
+          <span className="installhint__icon">
+            <Shield size={17} />
+          </span>
+          <div>
+            <strong>Adicione à tela inicial</strong>
+            <small>
+              Abre em tela cheia, sem barra do navegador, e continua no ar
+              mesmo com internet ruim no talhão.
+            </small>
+          </div>
+          <button
+            type="button"
+            onClick={() => setInstallDismissed(true)}
+            aria-label="Dispensar"
+          >
+            <X size={13} />
+          </button>
+        </div>
+      )}
 
       {/* Índice de risco — o motivo de abrir o app num dia comum. */}
       <section className="riskcard" aria-labelledby="risk-title">
@@ -151,58 +185,93 @@ export function HomeScreen({
         </button>
       </section>
 
-      {/* Prontidão da rede */}
-      <button
-        type="button"
-        className="rowcard"
-        onClick={() => onOpenTab("rede")}
-      >
-        <span className="rowcard__icon rowcard__icon--brand">
-          <Shield size={19} />
-        </span>
-        <span className="rowcard__body">
-          <strong>Rede ativa na sua região</strong>
-          <small>23 pessoas · brigada a 11 min</small>
-        </span>
-        <ChevronRight size={17} />
-      </button>
+      <ReadinessChecklist orgId={org.id} onToast={onToast} />
 
-      <button
-        type="button"
-        className="rowcard"
-        onClick={() => onOpenTab("mapa")}
-      >
-        <span className="rowcard__icon">
-          <Crosshair size={19} />
-        </span>
-        <span className="rowcard__body">
-          <strong>
-            {locationState === "gps"
-              ? "Posição do aparelho"
-              : "Talhão Pasto Sul · Boa Esperança"}
-          </strong>
-          <small className="num">
-            {coords.lat.toFixed(4)}, {coords.lon.toFixed(4)} · ±{accuracyM} m
-          </small>
-        </span>
-        <span
-          className="rowcard__action"
-          role="button"
-          tabIndex={0}
-          onClick={(event) => {
-            event.stopPropagation();
-            onLocate();
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
+      <div className="cardrow">
+        <button
+          type="button"
+          className="rowcard"
+          onClick={() => onOpenTab("rede")}
+        >
+          <span className="rowcard__icon rowcard__icon--brand">
+            <Shield size={19} />
+          </span>
+          <span className="rowcard__body">
+            <strong>Rede ativa na sua região</strong>
+            <small>23 pessoas · brigada a 11 min</small>
+          </span>
+          <ChevronRight size={17} />
+        </button>
+
+        <button
+          type="button"
+          className="rowcard"
+          onClick={() => onOpenTab("mapa")}
+        >
+          <span className="rowcard__icon">
+            <Crosshair size={19} />
+          </span>
+          <span className="rowcard__body">
+            <strong>
+              {locationState === "gps"
+                ? "Posição do aparelho"
+                : "Talhão Pasto Sul · Boa Esperança"}
+            </strong>
+            <small className="num">
+              {coords.lat.toFixed(4)}, {coords.lon.toFixed(4)} · ±{accuracyM} m
+            </small>
+          </span>
+          <span
+            className="rowcard__action"
+            role="button"
+            tabIndex={0}
+            onClick={(event) => {
               event.stopPropagation();
               onLocate();
-            }
-          }}
-        >
-          {locationState === "buscando" ? "…" : "GPS"}
-        </span>
-      </button>
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.stopPropagation();
+                onLocate();
+              }
+            }}
+          >
+            {locationState === "buscando" ? "…" : "GPS"}
+          </span>
+        </button>
+      </div>
+
+      {recent.length > 0 && (
+        <>
+          <div className="sectionlabel">
+            <span>Ocorrências recentes</span>
+            <small>{recent.length} nos últimos registros</small>
+          </div>
+          <ul className="recentlist">
+            {recent.map((item) => (
+              <li key={item.id}>
+                <span
+                  className={`recentlist__dot${item.outcome ? ` is-${item.outcome}` : ""}`}
+                />
+                <div>
+                  <strong>{item.code}</strong>
+                  <small>
+                    {STATUS_LABEL[item.status]} ·{" "}
+                    {new Date(item.updatedAt).toLocaleDateString("pt-BR")}
+                  </small>
+                </div>
+                <span>
+                  {item.outcome === "procedente"
+                    ? "confirmado"
+                    : item.outcome === "improcedente"
+                      ? "alarme falso"
+                      : "sem desfecho"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <div className="trustline">
         <Lock size={15} />

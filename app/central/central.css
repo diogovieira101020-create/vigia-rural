@@ -7,10 +7,16 @@
    ========================================================================= */
 
 .ops {
+  /* Travado ao viewport visível (dvh + fixed): a Central roda num monitor
+     grande na maior parte do tempo, mas o mesmo princípio do app de campo
+     vale aqui — sem isso, uma janela redimensionada ou um zoom do sistema
+     operacional deixa um vão de fundo entre o rodapé e a borda da tela. */
+  position: fixed;
+  inset: 0;
   display: grid;
   grid-template-rows: 58px minmax(0, 1fr) 34px;
   height: 100vh;
-  height: 100svh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--bg-deep);
   color: var(--ink);
@@ -1079,9 +1085,11 @@
 
 @media (max-width: 1150px) {
   .ops {
+    position: static;
     grid-template-rows: auto minmax(0, 1fr) auto;
     height: auto;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: visible;
   }
   .ops__bar {

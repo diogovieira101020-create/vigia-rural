@@ -306,3 +306,24 @@ export const Pause = make(<path d="M8.6 5v14M15.4 5v14" />);
 export const Plus = make(<path d="M12 5v14M5 12h14" />);
 
 export const Minus = make(<path d="M5 12h14" />);
+
+export const Copy = make(
+  <>
+    <rect x="8.6" y="8.6" width="12.4" height="12.4" rx="2.2" />
+    <path d="M15.4 8.6V5.8A2.2 2.2 0 0 0 13.2 3.6H5.8a2.2 2.2 0 0 0-2.2 2.2v7.4a2.2 2.2 0 0 0 2.2 2.2h2.8" />
+  </>,
+);
+
+export const Search = make(
+  <>
+    <circle cx="10.6" cy="10.6" r="6.6" />
+    <path d="m20.4 20.4-4.8-4.8" />
+  </>,
+);
+
+export const Download = make(
+  <>
+    <path d="M12 3.6v11.4M7.6 10.6 12 15l4.4-4.4" />
+    <path d="M4.6 17v2.6a1.8 1.8 0 0 0 1.8 1.8h11.2a1.8 1.8 0 0 0 1.8-1.8V17" />
+  </>,
+);

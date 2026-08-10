@@ -36,6 +36,8 @@ export type Org = {
   /** CAR para propriedades, CNPJ/registro para brigadas e órgãos. */
   registry: string;
   detail: string;
+  /** Canal direto — habilita os botões de ligar/mensagem na tela de rede. */
+  phone: string;
 };
 
 export type Person = {

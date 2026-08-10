@@ -3,7 +3,7 @@
 /**
  * App de campo — a tela de quem está com o pé na terra.
  *
- * Três decisões de projeto mandam em tudo aqui:
+ * Quatro decisões de projeto mandam em tudo aqui:
  *
  *  1. Sob sol forte e com pressa, contraste e tamanho valem mais que
  *     elegância. Nada abaixo de 12 px, alvo de toque de 46 px, uma ação
@@ -12,20 +12,18 @@
  *     confirmação é por pressão contínua e mostra antes o que vai acontecer.
  *  3. Toda restrição é explicada. Um botão desativado sem motivo é um usuário
  *     que desinstala o app.
+ *  4. Celular e mesa são o mesmo produto, não a mesma tela em dois tamanhos:
+ *     no celular é um app de tela cheia travado ao viewport visível; na mesa
+ *     é um app de trabalho com rail de navegação e conteúdo em duas colunas.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ThemeScope } from "@/components/ThemeScope.tsx";
-import { Wordmark } from "@/components/Brand.tsx";
+import { ContrastScope } from "@/components/ContrastScope.tsx";
+import { Logomark, Wordmark } from "@/components/Brand.tsx";
 import { Toast, type ToastState } from "@/components/ui.tsx";
-import {
-  Bell,
-  Home,
-  MapIcon,
-  Shield,
-  Users,
-} from "@/components/Icons.tsx";
+import { Bell, Home, MapIcon, Radio, Shield, Users } from "@/components/Icons.tsx";
 import { dailyRisk } from "@/lib/fire.ts";
 import { can, evaluateEscalation, type Actor, type Scope } from "@/lib/policy.ts";
 import { consume, formatRetry, LIMITS, newBucket, type Bucket } from "@/lib/ratelimit.ts";
@@ -39,6 +37,7 @@ import {
   personById,
 } from "@/lib/scenario.ts";
 import { useTicker, useVigiaBus } from "@/lib/bus.ts";
+import { usePersistentState } from "@/lib/storage.ts";
 import { nextCode, type Command } from "@/lib/store.ts";
 import { pendingCommands } from "@/lib/director.ts";
 import { parcelAt } from "@/lib/selectors.ts";
@@ -49,7 +48,8 @@ import { MapScreen } from "./MapScreen.tsx";
 import { NetworkScreen } from "./NetworkScreen.tsx";
 import { ProfileScreen } from "./ProfileScreen.tsx";
 import { ReportSheet, type ReportDraft } from "./ReportSheet.tsx";
-import { NetworkMirror } from "./NetworkMirror.tsx";
+import { ActivityPanel } from "./ActivityPanel.tsx";
+import type { Settings } from "./types.ts";
 import type { Tab } from "./types.ts";
 import "./campo.css";
 
@@ -59,6 +59,12 @@ const TABS: { id: Tab; label: string; icon: typeof Home }[] = [
   { id: "rede", label: "Rede", icon: Users },
   { id: "perfil", label: "Perfil", icon: Shield },
 ];
+
+const DEFAULT_SETTINGS: Settings = {
+  highContrast: false,
+  soundAlerts: true,
+  smsNotify: true,
+};
 
 type LocationState = "cadastro" | "buscando" | "gps" | "negado";
 
@@ -84,7 +90,10 @@ function actorFor(person: Person): Actor {
 }
 
 export default function CampoPage() {
-  const [personId, setPersonId] = useState<string>(PEOPLE[0].id);
+  const [personId, setPersonId] = usePersistentState<string>(
+    "vigia-rural:person",
+    PEOPLE[0].id,
+  );
   const person = personById(personId);
   const org = orgById(person.orgId);
   const actor = useMemo(() => actorFor(person), [person]);
@@ -99,6 +108,12 @@ export default function CampoPage() {
   const [toast, setToast] = useState<ToastState>(null);
   const [draft, setDraft] = useState<ReportDraft | null>(null);
   const [personPicker, setPersonPicker] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+
+  const [settings, setSettings] = usePersistentState<Settings>(
+    "vigia-rural:settings",
+    DEFAULT_SETTINGS,
+  );
 
   const [coords, setCoords] = useState<LatLon>(DEMO_ORIGIN);
   const [accuracyM, setAccuracyM] = useState(9);
@@ -114,6 +129,16 @@ export default function CampoPage() {
       ),
     [state.incidents],
   );
+
+  const recentIncidents = useMemo(
+    () =>
+      state.incidents
+        .filter((i) => i.status === "encerrado" || i.status === "cancelado")
+        .sort((a, b) => b.updatedAt - a.updatedAt),
+    [state.incidents],
+  );
+
+  const reportIncident = incident ?? recentIncidents[0];
 
   // A aba que abriu a ocorrência conduz a simulação da rede do outro lado.
   const peerIds = useMemo(() => peers.map((p) => p.id), [peers]);
@@ -170,16 +195,13 @@ export default function CampoPage() {
     [buckets, personId],
   );
 
-  const openReport = useCallback(
-    (intent: "fogo" | "suspeita") => {
-      setDraft({
-        intent,
-        evidence: intent === "fogo" ? "chamas" : "fumaca",
-        note: "",
-      });
-    },
-    [],
-  );
+  const openReport = useCallback((intent: "fogo" | "suspeita") => {
+    setDraft({
+      intent,
+      evidence: intent === "fogo" ? "chamas" : "fumaca",
+      note: "",
+    });
+  }, []);
 
   const submitReport = useCallback(
     (submitted: ReportDraft) => {
@@ -300,66 +322,29 @@ export default function CampoPage() {
   return (
     <div className="campo">
       <ThemeScope theme="campo" color="#eef1ec" />
+      <ContrastScope high={settings.highContrast} />
 
-      <aside className="campo__aside campo__aside--left">
-        <Link href="/apresentacao" className="campo__back">
-          <Wordmark size={26} />
+      <nav className="rail" aria-label="Navegação principal">
+        <Link href="/apresentacao" className="rail__brand" aria-label="Vigia Rural">
+          <Logomark size={26} />
         </Link>
-        <div className="campo__narrative">
-          <span className="eyebrow">App de campo</span>
-          <h1>
-            Um toque longo
-            <br />
-            para acionar.
-          </h1>
-          <p className="lede">
-            É a tela que o produtor abre todo dia pelo índice de risco — e que
-            ele já sabe usar quando precisa acionar.
-          </p>
-          <ol className="campo__steps">
-            <li>
-              <b>1</b>
-              <div>
-                <strong>Abra a Central em outra janela</strong>
-                <span>
-                  As duas telas compartilham o mesmo estado, ao vivo.
-                </span>
-                <Link href="/central" className="campo__link">
-                  Abrir Central de Operações →
-                </Link>
-              </div>
-            </li>
-            <li>
-              <b>2</b>
-              <div>
-                <strong>Toque em “Detectei fogo”</strong>
-                <span>
-                  A folha mostra o alcance antes do envio, e a confirmação é por
-                  pressão contínua.
-                </span>
-              </div>
-            </li>
-            <li>
-              <b>3</b>
-              <div>
-                <strong>Acompanhe a rede responder</strong>
-                <span>
-                  Vizinho confirma, satélite valida, brigada assume e despacha.
-                </span>
-              </div>
-            </li>
-          </ol>
-        </div>
-        <div className="campo__peer">
-          <span
-            className="pulse-dot"
-            style={{ color: centralOnline ? "var(--brand)" : "var(--faint)" }}
-          />
-          {centralOnline
-            ? "Central de Operações conectada"
-            : "Central de Operações fechada"}
-        </div>
-      </aside>
+        {TABS.map((item) => {
+          const Icon = item.icon;
+          const active = tab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={active ? "is-active" : undefined}
+              onClick={() => setTab(item.id)}
+              aria-current={active ? "page" : undefined}
+            >
+              <Icon size={21} strokeWidth={active ? 2 : 1.6} />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
 
       <main className="phone" aria-label="Aplicativo Vigia Rural">
         <header className="phone__header">
@@ -370,6 +355,15 @@ export default function CampoPage() {
           >
             <Wordmark size={24} />
           </button>
+
+          <span className={`phone__peerstatus${centralOnline ? " is-live" : ""}`}>
+            <span
+              className="pulse-dot"
+              style={{ color: centralOnline ? "var(--brand)" : "var(--faint)" }}
+            />
+            {centralOnline ? "Central conectada" : "Central de Operações"}
+          </span>
+
           <div className="phone__header-right">
             {incident && (
               <span className="phone__live">
@@ -377,6 +371,16 @@ export default function CampoPage() {
                 ao vivo
               </span>
             )}
+            <button
+              type="button"
+              className={`phone__iconbtn${activityOpen ? " is-active" : ""}`}
+              onClick={() => setActivityOpen((v) => !v)}
+              aria-label="Atividade da rede"
+              aria-pressed={activityOpen}
+              title="Atividade da rede"
+            >
+              <Radio size={17} />
+            </button>
             <button
               type="button"
               className="phone__avatar"
@@ -414,6 +418,8 @@ export default function CampoPage() {
                 onReport={openReport}
                 onOpenTab={setTab}
                 actor={actor}
+                recent={recentIncidents.slice(0, 3)}
+                onToast={setToast}
               />
             ))}
 
@@ -426,6 +432,7 @@ export default function CampoPage() {
               locationState={locationState}
               onLocate={requestLocation}
               actor={actor}
+              onToast={setToast}
             />
           )}
 
@@ -438,34 +445,24 @@ export default function CampoPage() {
               person={person}
               org={org}
               incident={incident}
+              reportIncident={reportIncident}
+              history={recentIncidents}
               buckets={buckets}
               now={now}
+              settings={settings}
+              onSettingsChange={setSettings}
               onToast={setToast}
             />
           )}
         </div>
-
-        <nav className="phone__nav" aria-label="Navegação principal">
-          {TABS.map((item) => {
-            const Icon = item.icon;
-            const active = tab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={active ? "is-active" : undefined}
-                onClick={() => setTab(item.id)}
-                aria-current={active ? "page" : undefined}
-              >
-                <Icon size={21} strokeWidth={active ? 2 : 1.6} />
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
       </main>
 
-      <NetworkMirror incident={incident} now={now} person={person} />
+      <ActivityPanel
+        open={activityOpen}
+        onClose={() => setActivityOpen(false)}
+        incident={incident}
+        person={person}
+      />
 
       <ReportSheet
         draft={draft}
@@ -533,6 +530,14 @@ export default function CampoPage() {
                 );
               })}
             </div>
+            <Link
+              href="/central"
+              className="campo__link"
+              onClick={() => setPersonPicker(false)}
+              style={{ display: "block", marginTop: 14 }}
+            >
+              Abrir Central de Operações em outra janela →
+            </Link>
           </div>
         </div>
       )}

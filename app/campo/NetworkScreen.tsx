@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { UnitIcon } from "@/components/FieldMap.tsx";
 import { OrgAvatar } from "@/components/ui.tsx";
-import { Drop, Users } from "@/components/Icons.tsx";
+import { Drop, Message, Phone, Search, Users } from "@/components/Icons.tsx";
 import { distanceM, formatDistance } from "@/lib/geo.ts";
 import { ROLE_LABEL } from "@/lib/policy.ts";
 import { DEMO_ORIGIN, ORGS, UNITS, UNIT_LABEL, WATER, WATER_LABEL, orgById } from "@/lib/scenario.ts";
@@ -15,6 +15,16 @@ const KIND_LABEL: Record<string, string> = {
   orgao: "Órgão público",
 };
 
+// Intervalo de marcas diacríticas combinantes (U+0300–U+036F), usado para
+// tirar acento depois de normalizar em NFD — assim a busca acha "Uruçuí"
+// digitando "urucui".
+const DIACRITICS = /[̀-ͯ]/g;
+const normalize = (value: string) =>
+  value.normalize("NFD").replace(DIACRITICS, "").toLowerCase();
+
+/** Telefone só com dígitos, formato aceito por `tel:`/`sms:`. */
+const dial = (phone: string) => phone.replace(/[^\d+]/g, "");
+
 export function NetworkScreen({
   incident,
   person,
@@ -23,6 +33,7 @@ export function NetworkScreen({
   person: Person;
 }) {
   const origin = incident?.origin ?? DEMO_ORIGIN;
+  const [query, setQuery] = useState("");
 
   const entities = useMemo(
     () =>
@@ -31,6 +42,16 @@ export function NetworkScreen({
         .sort((a, b) => a.dist - b.dist),
     [origin, person.orgId],
   );
+
+  const filteredEntities = useMemo(() => {
+    const q = normalize(query.trim());
+    if (!q) return entities;
+    return entities.filter(
+      ({ org }) =>
+        normalize(org.name).includes(q) ||
+        normalize(KIND_LABEL[org.kind]).includes(q),
+    );
+  }, [entities, query]);
 
   const water = useMemo(
     () =>
@@ -64,52 +85,103 @@ export function NetworkScreen({
         </li>
       </ul>
 
-      <div className="sectionlabel">
-        <span>Quem responde perto de você</span>
-      </div>
-      <ul className="entitylist">
-        {entities.map(({ org, dist }) => (
-          <li key={org.id}>
-            <OrgAvatar initials={org.initials} accent={org.accent} size={40} online />
-            <div>
-              <strong>{org.name}</strong>
-              <small>
-                {KIND_LABEL[org.kind]} · {org.detail}
-              </small>
-            </div>
-            <span className="entitylist__meta num">{formatDistance(dist)}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="cardrow">
+        <div className="cardblock">
+          <div className="sectionlabel">
+            <span>Quem responde perto de você</span>
+          </div>
+          <label className="searchfield">
+            <Search size={15} />
+            <input
+              type="search"
+              inputMode="search"
+              placeholder="Buscar por nome ou tipo…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              aria-label="Buscar organização na rede"
+            />
+          </label>
+          {filteredEntities.length === 0 ? (
+            <p className="netempty">
+              Nenhuma organização encontrada para “{query}”.
+            </p>
+          ) : (
+            <ul className="entitylist">
+              {filteredEntities.map(({ org, dist }) => (
+                <li key={org.id}>
+                  <OrgAvatar
+                    initials={org.initials}
+                    accent={org.accent}
+                    size={40}
+                    online
+                  />
+                  <div>
+                    <strong>{org.name}</strong>
+                    <small>
+                      {KIND_LABEL[org.kind]} · {org.detail}
+                    </small>
+                  </div>
+                  <span className="entitylist__meta">
+                    <span className="entitylist__dist num">
+                      {formatDistance(dist)}
+                    </span>
+                    <a
+                      className="entitylist__contact"
+                      href={`tel:${dial(org.phone)}`}
+                      aria-label={`Ligar para ${org.name}`}
+                      title={`Ligar · ${org.phone}`}
+                    >
+                      <Phone size={13} />
+                    </a>
+                    <a
+                      className="entitylist__contact"
+                      href={`sms:${dial(org.phone)}`}
+                      aria-label={`Enviar SMS para ${org.name}`}
+                      title={`SMS · ${org.phone}`}
+                    >
+                      <Message size={13} />
+                    </a>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-      <div className="sectionlabel">
-        <span>Recursos disponíveis</span>
-        <small>ordenados por tempo de chegada</small>
+        <div className="cardblock">
+          <div className="sectionlabel">
+            <span>Recursos disponíveis</span>
+            <small>por tempo de chegada</small>
+          </div>
+          <ul className="unitlist">
+            {UNITS.map((unit) => {
+              const org = orgById(unit.orgId);
+              const km = (distanceM(unit.base, origin) * 1.3) / 1000;
+              const eta =
+                (km / unit.speedKmh) * 60 + (unit.kind === "drone" ? 1 : 4);
+              return (
+                <li key={unit.id}>
+                  <span className="unitlist__icon">
+                    <UnitIcon kind={unit.kind} size={17} />
+                  </span>
+                  <div>
+                    <strong>{unit.name}</strong>
+                    <small>
+                      {UNIT_LABEL[unit.kind]} · {org.short}
+                      {unit.waterL > 0
+                        ? ` · ${unit.waterL.toLocaleString("pt-BR")} L`
+                        : ""}
+                    </small>
+                  </div>
+                  <span className="unitlist__eta num">
+                    {Math.round(eta)} min
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
-      <ul className="unitlist">
-        {UNITS.map((unit) => {
-          const org = orgById(unit.orgId);
-          const km = (distanceM(unit.base, origin) * 1.3) / 1000;
-          const eta = (km / unit.speedKmh) * 60 + (unit.kind === "drone" ? 1 : 4);
-          return (
-            <li key={unit.id}>
-              <span className="unitlist__icon">
-                <UnitIcon kind={unit.kind} size={17} />
-              </span>
-              <div>
-                <strong>{unit.name}</strong>
-                <small>
-                  {UNIT_LABEL[unit.kind]} · {org.short}
-                  {unit.waterL > 0
-                    ? ` · ${unit.waterL.toLocaleString("pt-BR")} L`
-                    : ""}
-                </small>
-              </div>
-              <span className="unitlist__eta num">{Math.round(eta)} min</span>
-            </li>
-          );
-        })}
-      </ul>
 
       <div className="sectionlabel">
         <span>Água mais próxima do foco</span>

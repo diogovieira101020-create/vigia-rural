@@ -35,7 +35,13 @@ export const metadata: Metadata = {
     ],
   },
   twitter: { card: "summary_large_image", title, description, images: ["/og.png"] },
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Vigia Rural",
+  },
 };
 
 export const viewport: Viewport = {

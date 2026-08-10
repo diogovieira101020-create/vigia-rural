@@ -8,7 +8,8 @@ import {
   MapLegend,
   type LayerId,
 } from "@/components/FieldMap.tsx";
-import { Crosshair, EyeOff, Layers, Lock } from "@/components/Icons.tsx";
+import type { ToastState } from "@/components/ui.tsx";
+import { Copy, Crosshair, EyeOff, Layers, Lock } from "@/components/Icons.tsx";
 import type { Actor } from "@/lib/policy.ts";
 import type { Incident, LatLon } from "@/lib/domain.ts";
 import { hasExactAccess } from "@/lib/selectors.ts";
@@ -22,6 +23,7 @@ export function MapScreen({
   locationState,
   onLocate,
   actor,
+  onToast,
 }: {
   incident?: Incident;
   now: number;
@@ -30,6 +32,7 @@ export function MapScreen({
   locationState: string;
   onLocate: () => void;
   actor: Actor;
+  onToast: (toast: ToastState) => void;
 }) {
   const [layers, setLayers] = useState<Record<LayerId, boolean>>({
     ...DEFAULT_LAYERS,
@@ -40,6 +43,25 @@ export function MapScreen({
   const exact = incident ? hasExactAccess(incident, actor.id, now) : true;
   const shown = incident ? incident.origin : coords;
   const cell = coarsen(shown, 1000);
+
+  const copyCoords = async () => {
+    // Copia exatamente o que está na tela — nunca a coordenada exata quando a
+    // visibilidade está reduzida, senão o botão vira um jeito de furar a
+    // própria proteção de privacidade que a tela ao lado explica.
+    const text = exact
+      ? `${shown.lat.toFixed(5)}, ${shown.lon.toFixed(5)}`
+      : `${cell.lat.toFixed(3)}, ${cell.lon.toFixed(3)} (quadrante ~1 km)`;
+    try {
+      await navigator.clipboard.writeText(text);
+      onToast({ message: "Coordenada copiada", detail: text });
+    } catch {
+      onToast({
+        message: "Não foi possível copiar",
+        tone: "warn",
+        detail: text,
+      });
+    }
+  };
 
   return (
     <section className="screen screen--map">
@@ -84,58 +106,65 @@ export function MapScreen({
 
       <MapLegend compact />
 
-      <div className="coordcard">
-        <div className="coordcard__head">
-          <Crosshair size={17} />
+      <div className="cardrow">
+        <div className="coordcard">
+          <div className="coordcard__head">
+            <Crosshair size={17} />
+            <div>
+              <strong>
+                {incident
+                  ? "Coordenada da ocorrência"
+                  : locationState === "gps"
+                    ? "Posição do aparelho"
+                    : "Ponto cadastrado do talhão"}
+              </strong>
+              <small className="num">
+                {exact
+                  ? formatLatLon(shown)
+                  : `${formatLatLon(cell, true)} · quadrante de 1 km`}
+              </small>
+            </div>
+            <div className="coordcard__actions">
+              <button type="button" onClick={copyCoords} aria-label="Copiar coordenada">
+                <Copy size={13} />
+              </button>
+              <button type="button" onClick={onLocate}>
+                {locationState === "buscando" ? "…" : "GPS"}
+              </button>
+            </div>
+          </div>
+          <ul className="coordcard__grid">
+            <li>
+              <small>Precisão</small>
+              <b className="num">± {accuracyM} m</b>
+            </li>
+            <li>
+              <small>Origem</small>
+              <b>{locationState === "gps" ? "GPS" : "Cadastro"}</b>
+            </li>
+            <li>
+              <small>Visibilidade</small>
+              <b>{exact ? "Exata" : "Reduzida"}</b>
+            </li>
+          </ul>
+        </div>
+
+        <div className="privacycard">
+          <span className="privacycard__icon">
+            {exact ? <Lock size={18} /> : <EyeOff size={18} />}
+          </span>
           <div>
             <strong>
-              {incident
-                ? "Coordenada da ocorrência"
-                : locationState === "gps"
-                  ? "Posição do aparelho"
-                  : "Ponto cadastrado do talhão"}
-            </strong>
-            <small className="num">
               {exact
-                ? formatLatLon(shown)
-                : `${formatLatLon(cell, true)} · quadrante de 1 km`}
-            </small>
+                ? "Você vê a coordenada exata"
+                : "A rede vê apenas o quadrante"}
+            </strong>
+            <p>
+              Por padrão a localização circula arredondada para 1 km. A
+              coordenada exata só é liberada a quem aceita a ocorrência, por
+              tempo limitado, e cada liberação vira um registro assinado.
+            </p>
           </div>
-          <button type="button" onClick={onLocate}>
-            {locationState === "buscando" ? "…" : "GPS"}
-          </button>
-        </div>
-        <ul className="coordcard__grid">
-          <li>
-            <small>Precisão</small>
-            <b className="num">± {accuracyM} m</b>
-          </li>
-          <li>
-            <small>Origem</small>
-            <b>{locationState === "gps" ? "GPS" : "Cadastro"}</b>
-          </li>
-          <li>
-            <small>Visibilidade</small>
-            <b>{exact ? "Exata" : "Reduzida"}</b>
-          </li>
-        </ul>
-      </div>
-
-      <div className="privacycard">
-        <span className="privacycard__icon">
-          {exact ? <Lock size={18} /> : <EyeOff size={18} />}
-        </span>
-        <div>
-          <strong>
-            {exact
-              ? "Você vê a coordenada exata"
-              : "A rede vê apenas o quadrante"}
-          </strong>
-          <p>
-            Por padrão a localização circula arredondada para 1 km. A coordenada
-            exata só é liberada a quem aceita a ocorrência, por tempo limitado, e
-            cada liberação vira um registro assinado.
-          </p>
         </div>
       </div>
 
