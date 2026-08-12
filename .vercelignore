@@ -1,0 +1,10 @@
+Vigia-Rural-Apresentacao.pptx
+Vigia-Rural-Apresentacao.pptx.inspect.ndjson
+presentation_assets
+.presentation-build
+*.tar.gz
+dist
+.wrangler
+outputs
+work
+.gstack

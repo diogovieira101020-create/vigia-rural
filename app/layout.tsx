@@ -4,9 +4,13 @@ import "./globals.css";
 const title = "Vigia Rural — a primeira resposta ao fogo, coordenada";
 const description =
   "Plataforma de alerta geolocalizado para incêndios rurais: o produtor aciona, a rede certa recebe, a brigada despacha e tudo fica registrado. App de campo + Central de Operações.";
+const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const metadataBase = productionHost
+  ? new URL(`https://${productionHost}`)
+  : new URL("https://vigia-rural-alerta.borus-xd.chatgpt.site");
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://vigia-rural-alerta.borus-xd.chatgpt.site"),
+  metadataBase,
   title,
   description,
   applicationName: "Vigia Rural",
