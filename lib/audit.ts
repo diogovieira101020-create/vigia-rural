@@ -57,6 +57,9 @@ export const GENESIS_HASH = "0".repeat(64);
 export function canonicalize(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
+  // `undefined` é descartado para espelhar `JSON.stringify`, que omite chaves
+  // com esse valor em vez de serializá-las — sem isso, um evento montado com
+  // e sem uma chave opcional ausente produziria hashes diferentes.
   const entries = Object.entries(value as Record<string, unknown>)
     .filter(([, v]) => v !== undefined)
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));

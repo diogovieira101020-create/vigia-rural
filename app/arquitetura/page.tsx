@@ -211,9 +211,9 @@ export default function Arquitetura() {
           <table>
             <thead>
               <tr>
-                <th>Tabela</th>
-                <th>Papel</th>
-                <th>Campos principais</th>
+                <th scope="col">Tabela</th>
+                <th scope="col">Papel</th>
+                <th scope="col">Campos principais</th>
               </tr>
             </thead>
             <tbody>
@@ -248,10 +248,10 @@ export default function Arquitetura() {
           <table>
             <thead>
               <tr>
-                <th>Ameaça</th>
-                <th>Controle</th>
-                <th>Como</th>
-                <th>Estado</th>
+                <th scope="col">Ameaça</th>
+                <th scope="col">Controle</th>
+                <th scope="col">Como</th>
+                <th scope="col">Estado</th>
               </tr>
             </thead>
             <tbody>

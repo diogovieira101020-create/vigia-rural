@@ -268,7 +268,9 @@
 .screen {
   width: min(100%, 720px);
   margin: 0 auto;
-  padding: 18px 18px 26px;
+  /* A barra de navegação é fixa no celular. O espaço inferior mantém a última
+     ação inteiramente rolável acima dela, inclusive em aparelhos com safe area. */
+  padding: 18px 18px calc(96px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 18px;

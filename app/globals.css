@@ -630,6 +630,13 @@ p {
   animation: toast-in 0.26s var(--ease-spring) both;
 }
 
+@media (max-width: 899px) {
+  .toast {
+    top: calc(70px + env(safe-area-inset-top));
+    bottom: auto;
+  }
+}
+
 .toast div {
   display: flex;
   flex-direction: column;

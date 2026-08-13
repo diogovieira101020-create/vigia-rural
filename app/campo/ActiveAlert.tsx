@@ -211,37 +211,9 @@ export function ActiveAlert({
             )}
           </section>
 
-          {/* Linha do tempo — é o próprio log auditável */}
-          <section className="timeline">
-            <div className="sectionlabel">
-              <span>Registro da ocorrência</span>
-              <small>{incident.audit.length} eventos</small>
-            </div>
-            <ol>
-              {timeline.map((event) => {
-                const Icon = ACTION_ICON[event.action] ?? Satellite;
-                return (
-                  <li key={event.seq}>
-                    <span className="timeline__mark">
-                      <Icon size={13} />
-                    </span>
-                    <div>
-                      <strong>{event.summary}</strong>
-                      <small className="num">
-                        {new Date(event.ts).toLocaleTimeString("pt-BR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        })}{" "}
-                        · {event.actorName}
-                      </small>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </section>
-
+          {/* Ações operacionais vêm antes do registro. Ao confirmar segurança,
+              o novo evento aumenta a linha do tempo; mantê-la depois impede
+              que os controles críticos sejam empurrados para fora da tela. */}
           <div className="alertactions">
             <button
               type="button"
@@ -283,6 +255,37 @@ export function ActiveAlert({
               </button>
             </div>
           </div>
+
+          {/* Linha do tempo — é o próprio log auditável */}
+          <section className="timeline">
+            <div className="sectionlabel">
+              <span>Registro da ocorrência</span>
+              <small>{incident.audit.length} eventos</small>
+            </div>
+            <ol>
+              {timeline.map((event) => {
+                const Icon = ACTION_ICON[event.action] ?? Satellite;
+                return (
+                  <li key={event.seq}>
+                    <span className="timeline__mark">
+                      <Icon size={13} />
+                    </span>
+                    <div>
+                      <strong>{event.summary}</strong>
+                      <small className="num">
+                        {new Date(event.ts).toLocaleTimeString("pt-BR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        })}{" "}
+                        · {event.actorName}
+                      </small>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
         </div>
       </div>
     </section>
