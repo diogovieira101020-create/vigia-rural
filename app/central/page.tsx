@@ -177,7 +177,7 @@ export default function CentralPage() {
       <ThemeScope theme="ops" color="#070c0d" />
 
       <header className="ops__bar">
-        <Link href="/" className="ops__brand">
+        <Link href="/apresentacao" className="ops__brand">
           <Wordmark size={24} />
         </Link>
 
@@ -264,6 +264,7 @@ export default function CentralPage() {
               className="ops__iconbtn"
               onClick={() => setShowLayers((v) => !v)}
               aria-expanded={showLayers}
+              aria-label="Camadas do mapa"
               title="Camadas"
             >
               <Layers size={17} />

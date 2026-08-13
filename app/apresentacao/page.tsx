@@ -367,7 +367,7 @@ export default function Home() {
             {
               icon: <Shield size={18} />,
               title: "Identidade com vínculo",
-              body: "Documento, CAR da propriedade ou credencial funcional, prova de vida e chave presa ao aparelho. Sem vínculo comprovado, ninguém aciona.",
+              body: "Documento, CAR da propriedade ou credencial funcional, prova de vida e chave presa ao aparelho — sem isso, ninguém aciona. Nesta demonstração os perfis já entram verificados; validar CAR e CPF/CNPJ contra base oficial é o próximo passo de engenharia.",
             },
             {
               icon: <Lock size={18} />,
@@ -392,7 +392,7 @@ export default function Home() {
             {
               icon: <Signal size={18} />,
               title: "Degradação prevista",
-              body: "Fila local com reenvio, SMS e voz como canais alternativos, mapa que funciona sem tile externo e nenhuma coordenada enviada a provedor de terceiros.",
+              body: "O mapa não depende de tile externo e nenhuma coordenada vai a provedor de terceiros — isso roda neste protótipo. Fila local com reenvio, SMS e voz como canais alternativos é o desenho para quando a internet cai; ainda não estão no ar.",
             },
           ].map((item) => (
             <article key={item.title} className="controls__item">
@@ -432,6 +432,7 @@ export default function Home() {
               <li>Trilha de auditoria encadeada por SHA-256, verificável na tela</li>
               <li>Cartografia vetorial própria, sem dependência de rede</li>
               <li>Sincronização entre telas em tempo real</li>
+              <li>Localização reduzida a quadrante de 1 km, com liberação exata por tempo determinado e registrada</li>
             </ul>
           </div>
           <div className="scope__col scope__col--next">

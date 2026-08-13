@@ -168,7 +168,7 @@ export function HomeScreen({
           <small>
             {canAlert.allowed
               ? "toque para confirmar o alerta"
-              : "seu perfil registra como suspeita"}
+              : `${ROLE_LABEL[actor.role]} registra como suspeita — chega a quem confirma`}
           </small>
         </button>
         <button

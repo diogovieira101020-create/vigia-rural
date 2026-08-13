@@ -30,6 +30,7 @@ import {
   type ChainVerdict,
   type SealedRecord,
 } from "@/lib/audit.ts";
+import { buildReport, downloadTextFile, reportFileName } from "@/lib/report.ts";
 import { formatDistance, formatHa } from "@/lib/geo.ts";
 import {
   can,
@@ -367,7 +368,7 @@ export function DetailPanel({
                                 actorId: actor.id,
                                 actorName: actor.name,
                               },
-                              "alerta:assumir",
+                              "alerta:despachar",
                               "Despachar recurso",
                             )
                           }
@@ -501,13 +502,14 @@ export function DetailPanel({
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={() =>
+                onClick={() => {
+                  const content = buildReport(incident, Date.now());
+                  downloadTextFile(reportFileName(incident), content);
                   onToast({
-                    message: "Laudo gerado a partir da trilha",
-                    detail:
-                      "Área, linha do tempo, recursos empregados e participantes — exportável em PDF.",
-                  })
-                }
+                    message: "Laudo baixado",
+                    detail: reportFileName(incident),
+                  });
+                }}
               >
                 <FileText size={15} /> Laudo
               </button>

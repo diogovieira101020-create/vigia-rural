@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".gstack/**",
     ".vinext/**",
     ".wrangler/**",
+    ".vercel/**",
+    "dist/**",
     ".presentation-build/**",
     "presentation_assets/**",
   ]),

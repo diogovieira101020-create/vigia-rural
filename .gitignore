@@ -47,5 +47,8 @@ next-env.d.ts
 
 # artefatos da apresentação e empacotamentos locais
 /.presentation-build/
+/presentation_assets/
+/Vigia-Rural-Apresentacao.pptx
+/Vigia-Rural-Apresentacao.pptx.inspect.ndjson
 *.tar.gz
 ~$*

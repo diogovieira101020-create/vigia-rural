@@ -41,6 +41,7 @@ export type Action =
   | "alerta:confirmar"
   | "alerta:emergencia"
   | "alerta:assumir"
+  | "alerta:despachar"
   | "alerta:controlar"
   | "alerta:encerrar"
   | "alerta:cancelar"
@@ -71,6 +72,7 @@ const MATRIX: Record<Role, Action[]> = {
     "alerta:corroborar",
     "alerta:confirmar",
     "alerta:assumir",
+    "alerta:despachar",
     "alerta:controlar",
     "local:exato",
   ],
@@ -80,6 +82,7 @@ const MATRIX: Record<Role, Action[]> = {
     "alerta:confirmar",
     "alerta:emergencia",
     "alerta:assumir",
+    "alerta:despachar",
     "alerta:controlar",
     "alerta:encerrar",
     "alerta:cancelar",
@@ -93,6 +96,7 @@ const MATRIX: Record<Role, Action[]> = {
     "alerta:confirmar",
     "alerta:emergencia",
     "alerta:assumir",
+    "alerta:despachar",
     "alerta:controlar",
     "alerta:encerrar",
     "alerta:cancelar",

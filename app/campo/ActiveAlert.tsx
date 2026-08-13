@@ -269,7 +269,7 @@ export function ActiveAlert({
             <div className="alertactions__row">
               <button
                 type="button"
-                className="btn btn--ghost"
+                className="btn btn--warn"
                 onClick={() => onClose("improcedente")}
               >
                 Foi alarme falso

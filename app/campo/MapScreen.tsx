@@ -83,6 +83,7 @@ export function MapScreen({
           className="mapshell__layers"
           onClick={() => setShowLayers((open) => !open)}
           aria-expanded={showLayers}
+          aria-label="Camadas do mapa"
         >
           <Layers size={17} />
         </button>
@@ -128,7 +129,11 @@ export function MapScreen({
               <button type="button" onClick={copyCoords} aria-label="Copiar coordenada">
                 <Copy size={13} />
               </button>
-              <button type="button" onClick={onLocate}>
+              <button
+                type="button"
+                onClick={onLocate}
+                disabled={locationState === "buscando"}
+              >
                 {locationState === "buscando" ? "…" : "GPS"}
               </button>
             </div>

@@ -383,6 +383,18 @@ p {
   background: var(--line);
 }
 
+/* Ações que pesam na reputação ou revertem uma decisão anterior — precisam
+   ser visualmente diferentes do botão "ghost" neutro ao lado, senão alguém
+   sob pressão pode confirmar a opção errada sem querer. */
+.btn--warn {
+  border-color: var(--amber-line);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.btn--warn:hover:not(:disabled) {
+  background: var(--amber-line);
+}
+
 .btn--block {
   width: 100%;
 }

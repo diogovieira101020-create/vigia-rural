@@ -6,14 +6,21 @@ brigadas e autoridades **na ordem certa** — primeiro quem está no caminho do
 vento, depois quem apaga, depois quem coordena — e a ocorrência inteira fica
 registrada em uma trilha que ninguém consegue reescrever depois.
 
+**Aplicação publicada:** [vigia-rural.vercel.app](https://vigia-rural.vercel.app)
+
 Duas superfícies, um sistema:
 
 | Rota | Para quem | Contexto |
 | --- | --- | --- |
-| `/` | Plateia | Apresentação do conceito, do protocolo e do escopo |
+| `/apresentacao` | Plateia | Apresentação do conceito, do protocolo e do escopo |
 | `/campo` | Produtor, colaborador, brigadista | Celular sob sol forte, tema claro, uma ação por tela |
 | `/central` | Brigada e Defesa Civil | Monitor em turno longo, tema escuro, três painéis |
 | `/arquitetura` | Banca técnica | Arquitetura, modelo de dados, ameaças, LGPD e modelos |
+
+`/` redireciona direto para `/campo`: é o atalho que o app instalado (PWA) usa
+para abrir em tela cheia sem passar pela apresentação — `start_url` no
+`manifest.webmanifest` aponta para lá. Para mostrar o conceito a quem ainda
+não conhece o produto, comece por `/apresentacao`.
 
 As duas telas de operação compartilham o mesmo estado **em tempo real**, sem
 servidor e sem internet: abra `/campo` e `/central` em janelas diferentes e

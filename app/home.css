@@ -641,15 +641,11 @@
 }
 
 @media (max-width: 620px) {
-  .home__nav {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
+  /* O hero repete os dois mesmos destinos como CTA principal a poucos
+     parágrafos daqui — manter os botões também no header sticky duplicaria
+     quatro botões grandes na primeira tela e meia de rolagem. */
   .home__navcta {
-    width: 100%;
-  }
-  .home__navcta .btn {
-    flex: 1;
+    display: none;
   }
   .decisions article {
     grid-template-columns: 1fr;
